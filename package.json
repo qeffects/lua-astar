@@ -1,0 +1,27 @@
+{
+  "name": "lua-astar",
+  "version": "1.0.3",
+  "description": "Lua Astar library",
+  "main": "index.lua",
+  "scripts": {
+    "build": "tstl && mv ./dist/* .",
+    "dev": "tstl --watch"
+  },
+  "files": [
+    "*.lua",
+    "*.d.ts"
+  ],
+  "keywords": [
+    "lua",
+    "priority",
+    "list",
+    "tstl"
+  ],
+  "author": "qfluxstudios@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "lua-priority-list": "^1.0.1",
+    "lua-types": "^2.10.1",
+    "typescript-to-lua": "^1.0.1"
+  }
+}
