@@ -30,20 +30,70 @@ type CollidableRow = Collidable[];
 
 export type CollidableMap = eCollidableList[];
 
-const straightDistance = 1;
-const diagonalDistance = straightDistance * math.sqrt(2);
+let straightDistance = 1;
+let diagonalDistance = straightDistance * math.sqrt(2);
 
-const heuristic = (node: Collidable, goal: Coordinate): number => {
+/**
+ * Allows you to replace the heuristic distances
+ * @param straight Cost of going straight
+ * @param diagonal Cost of going diagonally
+ */
+export const configureHeuristicDistances = (straight: number, diagonal: number) => {
+    straightDistance = straight;
+    diagonalDistance = diagonal;
+}
+
+let heuristic = (node: Collidable, goal: Coordinate): number => {
     const dx = math.abs(node.x - goal.x);
     const dy = math.abs(node.y - goal.y);
 
     return straightDistance * (dx + dy) + (diagonalDistance - 2 * straightDistance) * math.min(dx, dy);
 };
 
+/**
+ * Allows you to replace the default heuristic function if you got something exotic
+ * @param newH the new heuristic function
+ */
+export const replaceHeuristicFunction = (newH: (node: Collidable, goal: Coordinate) => number) => {
+    heuristic = newH;
+}
+
+// The list of navigable neighbors for a tile, remove math.sqrt(2) entries for only square movement etc.
+// The path cost is the geometric cost of travelling from a tile to the left or diagonally for example
+let neighbors = [
+    { x: -1, y:  0, pathCost: 1 },
+    { x:  1, y:  0, pathCost: 1 },
+    { x:  0, y: -1, pathCost: 1 },
+    { x:  0, y: +1, pathCost: 1 },
+    { x: -1, y: -1, pathCost: math.sqrt(2), blockedBy: [0, 2] },
+    { x: -1, y: +1, pathCost: math.sqrt(2), blockedBy: [0, 5] },
+    { x:  1, y: -1, pathCost: math.sqrt(2), blockedBy: [2, 1] },
+    { x:  1, y: +1, pathCost: math.sqrt(2), blockedBy: [3, 1] },
+];
+
+/*
+       x
+y  -1  0 +1
+-1 [] [] []
+0  []    []
++1 [] [] []
+
+*/
+
+interface Neighbor {x: number, y:number, pathCost: number, blockedBy?: number[]};
+
+/**
+ * Allows you to reconfigure the list of the pathable neighbors
+ * @param n The list (see original source for how it should look)
+ */
+export const configurePathableNeighbors = (n: Neighbor[]) => {
+    neighbors = n;
+}
+
 const checkTile = (
     target: eCollidable | undefined,
     parent: eCollidable,
-    diag: boolean,
+    tileTravelCost: number,
     usedList: LuaTable<Collidable, eCollidable>,
     openList: PriorityList<eCollidable>,
     end: Coordinate
@@ -53,7 +103,7 @@ const checkTile = (
     }
 
     if (!target.blocked) {
-        const tcost = diag ? diagonalDistance : straightDistance;
+        const tcost = tileTravelCost;
         const cost = target.travelCost * tcost;
         const parentCost = parent.pathCost || 0;
         const pathCost = parentCost + cost;
@@ -79,7 +129,7 @@ const checkTile = (
             target.heuristicToEnd = hCost;
             target.previous = parent;
             target.totalWeight = pathCost + hCost;
-            openList.put(pathCost + hCost, target, hCost);
+            openList.put(pathCost + hCost, target);
             target.inOpenList = true;
 
             if (target.previous.previous === target) {
@@ -88,17 +138,6 @@ const checkTile = (
         }
     }
 };
-
-const neighbors = [
-    { x: -1, y: 0, diag: false },
-    { x: -1, y: -1, diag: true },
-    { x: -1, y: +1, diag: true },
-    { x: 0, y: -1, diag: false },
-    { x: 0, y: +1, diag: false },
-    { x: 1, y: 0, diag: false },
-    { x: 1, y: -1, diag: true },
-    { x: 1, y: +1, diag: true },
-];
 
 const parseNeighbors = (
     map: CollidableMap,
@@ -122,12 +161,34 @@ const parseNeighbors = (
         if (map[target.x + neighbors[i].x]) {
             const neighbor = map[target.x + neighbors[i].x][target.y + neighbors[i].y];
             if (!(neighbor === target.previous)) {
-                checkTile(neighbor, target, neighbors[i].diag, usedList, openList, end);
+                if (neighbors[i].blockedBy){
+                    const b = neighbors[i].blockedBy;
+                    if (b){
+                        const bi1 = b[0];
+                        const bi2 = b[1];
+
+                        const n2 = map[target.x + neighbors[bi1].x][target.y + neighbors[bi1].y].blocked;
+                        const n3 = map[target.x + neighbors[bi2].x][target.y + neighbors[bi2].y].blocked;
+
+                        if (!(n2&&n3)){
+                            checkTile(neighbor, target, neighbors[i].pathCost, usedList, openList, end);
+                        }
+                    }
+                } else {
+                    checkTile(neighbor, target, neighbors[i].pathCost, usedList, openList, end);
+                }
             }
         }
     }
 };
 
+/**
+ * The pathing function, for performance reasons I recommend that your basic travel cost is just slightly below 1, like 0.95
+ * @param map The map that will be pathed through
+ * @param start Coordinates of the start
+ * @param end Coordinates of the end
+ * @returns Your final path, a series of lines, or series of coordinates, if you prefer
+ */
 export const astar = (map: CollidableMap, start: Coordinate, end: Coordinate): Line[] | undefined => {
     let finpath: eCollidable | undefined;
     const path: Coordinate[] = [];
@@ -149,7 +210,6 @@ export const astar = (map: CollidableMap, start: Coordinate, end: Coordinate): L
             totalWeight: h + tcost,
             blocked: startNode.blocked,
         },
-        h
     );
 
     while (openList.list.length > 0) {

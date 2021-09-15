@@ -1,6 +1,6 @@
 {
   "name": "lua-astar",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Lua Astar library",
   "main": "index.lua",
   "scripts": {
@@ -20,7 +20,7 @@
   "author": "qfluxstudios@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "lua-priority-list": "^1.0.1",
+    "lua-priority-list": "^1.0.3",
     "lua-types": "^2.10.1",
     "typescript-to-lua": "^1.0.1"
   }
