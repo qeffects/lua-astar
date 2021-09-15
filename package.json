@@ -21,7 +21,7 @@
   "repository": {"url": "https://github.com/qeffects/lua-astar"},
   "license": "MIT",
   "dependencies": {
-    "lua-priority-list": "^1.0.4",
+    "lua-priority-list": "^1.0.5",
     "lua-types": "^2.10.1",
     "typescript-to-lua": "^1.0.1"
   }
