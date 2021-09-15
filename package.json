@@ -18,6 +18,7 @@
     "tstl"
   ],
   "author": "qfluxstudios@gmail.com",
+  "repository": {"url": "https://github.com/qeffects/lua-astar"},
   "license": "MIT",
   "dependencies": {
     "lua-priority-list": "^1.0.3",
