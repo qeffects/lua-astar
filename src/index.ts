@@ -167,8 +167,13 @@ const parseNeighbors = (
                         const bi1 = b[0];
                         const bi2 = b[1];
 
-                        const n2 = map[target.x + neighbors[bi1].x][target.y + neighbors[bi1].y].blocked;
-                        const n3 = map[target.x + neighbors[bi2].x][target.y + neighbors[bi2].y].blocked;
+                        const n2 = map[target.x + neighbors[bi1].x] 
+                            && map[target.x + neighbors[bi1].x][target.y + neighbors[bi1].y]
+                            && map[target.x + neighbors[bi1].x][target.y + neighbors[bi1].y].blocked;
+
+                        const n3 = map[target.x + neighbors[bi2].x] 
+                            && map[target.x + neighbors[bi2].x][target.y + neighbors[bi2].y]
+                            && map[target.x + neighbors[bi2].x][target.y + neighbors[bi2].y].blocked;
 
                         if (!(n2&&n3)){
                             checkTile(neighbor, target, neighbors[i].pathCost, usedList, openList, end);
