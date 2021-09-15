@@ -253,5 +253,7 @@ export const astar = (map: CollidableMap, start: Coordinate, end: Coordinate): L
         }
     }
 
+    openList.free();
+
     return revpath;
 };
