@@ -1,10 +1,11 @@
 {
   "name": "lua-astar",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Lua Astar library",
   "main": "index.lua",
   "scripts": {
     "build": "tstl && mv ./dist/* .",
+    "git-publish": "tstl",
     "dev": "tstl --watch"
   },
   "files": [

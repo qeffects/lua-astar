@@ -3,3 +3,5 @@ dist
 .DS_Store
 index.lua
 index.d.ts
+ffi.d.ts
+ffi.lua
