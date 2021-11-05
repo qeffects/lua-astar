@@ -143,7 +143,7 @@ const parseNeighbors = (
  * @param end Coordinates of the end
  * @returns Your final path, a series of lines, or series of coordinates, if you prefer
  */
-export const astar = <T>(ffiMap: FFIMap, luaMap: LuaMap, start: LuaNode, end: LuaNode): LuaNode[] | undefined => {
+export const ffiAstar = <T>(ffiMap: FFIMap, luaMap: LuaMap, start: LuaNode, end: LuaNode): LuaNode[] | undefined => {
     let finpath: LuaNode | undefined;
     let steps: LuaNode[] = [];
 
