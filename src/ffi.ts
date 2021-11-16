@@ -32,12 +32,12 @@ type eCollidableList = FFIStruct[];
 
 export type FFIMap = eCollidableList;
 
-export type LuaMap<T = unknown> = LuaNode[] & {
-    heuristic: (node: T, node2: T) => number;
-    getNeighbors: (node: T) => LuaNode[];
-    twoNodeDist: (node: T, node2: T) => number;
-    getFFIindex: (node: T) => number;
-    isEnd: (node: T) => boolean;
+export type LuaMap = LuaNode[] & {
+    heuristic: (node: LuaNode, node2: LuaNode) => number;
+    getNeighbors: (node: LuaNode) => LuaNode[];
+    twoNodeDist: (node: LuaNode, node2: LuaNode) => number;
+    getFFIindex: (node: LuaNode) => number;
+    isEnd: (node: LuaNode) => boolean;
 };
 
 let straightDistance = 1;
