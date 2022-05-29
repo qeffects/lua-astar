@@ -17,7 +17,6 @@ type Collidable = {
 
 export type FFIStruct = {
     pathCost: number;
-    heuristicToEnd: number;
     totalWeight: number;
     inOpenList: boolean;
     inClosedList: boolean;
@@ -35,8 +34,6 @@ export type FFIMap = eCollidableList;
 export type LuaMap = LuaNode[] & {
     heuristic: (node: LuaNode, node2: LuaNode) => number;
     getNeighbors: (node: LuaNode) => LuaNode[];
-    twoNodeDist: (node: LuaNode, node2: LuaNode) => number;
-    getFFIindex: (node: LuaNode) => number;
     isEnd: (node: LuaNode) => boolean;
 };
 
@@ -70,7 +67,7 @@ const checkTile = (
     const ffiIndex = thisNode.ffiIndex;
 
     if (!ffiMap[ffiIndex].blocked) {
-        const tcost = luaMap.twoNodeDist(thisNode, parentNode);
+        const tcost = luaMap.heuristic(thisNode, parentNode);
         const cost = ffiMap[ffiIndex].travelCost * tcost;
 
         const parentCost = ffiMap[parentNode.ffiIndex].pathCost || 0;
@@ -95,7 +92,6 @@ const checkTile = (
             const hCost = luaMap.heuristic(thisNode, end);
 
             ffiMap[ffiIndex].pathCost = pathCost;
-            ffiMap[ffiIndex].heuristicToEnd = hCost;
             ffiMap[ffiIndex].totalWeight = pathCost + hCost;
             ffiMap[ffiIndex].inOpenList = true;
             

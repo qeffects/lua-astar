@@ -1,6 +1,6 @@
 {
   "name": "lua-astar",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Lua Astar library",
   "main": "index.lua",
   "scripts": {
